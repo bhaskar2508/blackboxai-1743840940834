@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings | Student-Teacher Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="module" src="../../scripts/auth.js"></script>
+    <script type="module" src="../../scripts/admin.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Include shared header -->
+    <div data-include="../../shared/header.html"></div>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 bg-white p-4 rounded-lg shadow">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 p-2 bg-blue-50 rounded">
+                        <i class="fas fa-user-shield text-blue-500 text-xl"></i>
+                        <span id="adminName" class="font-medium">Admin</span>
+                    </div>
+                    
+                    <nav class="space-y-1">
+                        <a href="dashboard.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-home w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="manage_teachers.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-chalkboard-teacher w-5"></i>
+                            <span>Manage Teachers</span>
+                        </a>
+                        <a href="manage_students.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-user-graduate w-5"></i>
+                            <span>Manage Students</span>
+                        </a>
+                        <a href="system_settings.html" class="flex items-center space-x-2 p-2 bg-blue-100 text-blue-700 rounded">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>System Settings</span>
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-2xl font-bold mb-6">System Settings</h2>
+                    
+                    <form id="settingsForm" class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-medium mb-4">General Settings</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="systemName" class="block text-sm font-medium text-gray-700">System Name</label>
+                                    <input type="text" id="systemName" 
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                                <div>
+                                    <label for="maxAppointments" class="block text-sm font-medium text-gray-700">Max Appointments per Student</label>
+                                    <input type="number" id="maxAppointments" min="1"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-medium mb-4">Appointment Settings</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="appointmentDuration" class="block text-sm font-medium text-gray-700">Default Duration (minutes)</label>
+                                    <input type="number" id="appointmentDuration" min="15" step="15"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                                <div>
+                                    <label for="advanceBookingDays" class="block text-sm font-medium text-gray-700">Max Advance Booking (days)</label>
+                                    <input type="number" id="advanceBookingDays" min="1"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-medium mb-4">Working Hours</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="startTime" class="block text-sm font-medium text-gray-700">Start Time</label>
+                                    <input type="time" id="startTime"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                                <div>
+                                    <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+                                    <input type="time" id="endTime"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Include header content
+        fetch('../../shared/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.querySelector('[data-include]').outerHTML = data;
+            });
+
+        // Load settings data
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await getCurrentUser();
+            if (!user) {
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            // Verify admin role
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                window.location.href = '../../index.html';
+                return;
+            }
+
+            // Load admin name
+            document.getElementById('adminName').textContent = 
+                userDoc.data().fullName || 'Admin';
+
+            // Load settings
+            const settingsDoc = await db.collection('settings').doc('system').get();
+            if (settingsDoc.exists) {
+                const settings = settingsDoc.data();
+                document.getElementById('systemName').value = settings.systemName || '';
+                document.getElementById('maxAppointments').value = settings.maxAppointments || 3;
+                document.getElementById('appointmentDuration').value = settings.appointmentDuration || 30;
+                document.getElementById('advanceBookingDays').value = settings.advanceBookingDays || 14;
+                document.getElementById('startTime').value = settings.startTime || '08:00';
+                document.getElementById('endTime').value = settings.endTime || '17:00';
+            }
+
+            // Handle form submission
+            document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const settings = {
+                    systemName: document.getElementById('systemName').value,
+                    maxAppointments: parseInt(document.getElementById('maxAppointments').value),
+                    appointmentDuration: parseInt(document.getElementById('appointmentDuration').value),
+                    advanceBookingDays: parseInt(document.getElementById('advanceBookingDays').value),
+                    startTime: document.getElementById('startTime').value,
+                    endTime: document.getElementById('endTime').value,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                try {
+                    await db.collection('settings').doc('system').set(settings, { merge: true });
+                    alert('Settings saved successfully!');
+                } catch (error) {
+                    console.error("Error saving settings:", error);
+                    alert('Failed to save settings');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
