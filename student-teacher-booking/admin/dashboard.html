@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Student-Teacher Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="module" src="../../scripts/auth.js"></script>
+    <script type="module" src="../../scripts/admin.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Include shared header -->
+    <div data-include="../../shared/header.html"></div>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 bg-white p-4 rounded-lg shadow">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3 p-2 bg-blue-50 rounded">
+                        <i class="fas fa-user-shield text-blue-500 text-xl"></i>
+                        <span id="adminName" class="font-medium">Admin</span>
+                    </div>
+                    
+                    <nav class="space-y-1">
+                        <a href="dashboard.html" class="flex items-center space-x-2 p-2 bg-blue-100 text-blue-700 rounded">
+                            <i class="fas fa-home w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="manage_teachers.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-chalkboard-teacher w-5"></i>
+                            <span>Manage Teachers</span>
+                        </a>
+                        <a href="manage_students.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-user-graduate w-5"></i>
+                            <span>Manage Students</span>
+                        </a>
+                        <a href="system_settings.html" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>System Settings</span>
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-2xl font-bold mb-6">System Overview</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Total Teachers</p>
+                                    <p id="teacherCount" class="text-2xl font-bold">0</p>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <i class="fas fa-chalkboard-teacher text-blue-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Total Students</p>
+                                    <p id="studentCount" class="text-2xl font-bold">0</p>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <i class="fas fa-user-graduate text-green-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">Pending Approvals</p>
+                                    <p id="pendingCount" class="text-2xl font-bold">0</p>
+                                </div>
+                                <div class="bg-purple-100 p-3 rounded-full">
+                                    <i class="fas fa-clock text-purple-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-yellow-400 text-xl"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    You have <span id="pendingRegistrations" class="font-medium">0</span> pending registrations to review.
+                                    <a href="manage_students.html" class="text-yellow-700 underline hover:text-yellow-600 ml-1">Review now</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-medium mb-4">Recent Activity</h3>
+                    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                        <ul id="recentActivity" class="divide-y divide-gray-200">
+                            <li class="px-4 py-4">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm text-gray-500">Loading activity...</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Include header content
+        fetch('../../shared/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.querySelector('[data-include]').outerHTML = data;
+            });
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await getCurrentUser();
+            if (!user) {
+                window.location.href = '../../login.html';
+                return;
+            }
+
+            // Verify admin role
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                window.location.href = '../../index.html';
+                return;
+            }
+
+            // Load admin name
+            document.getElementById('adminName').textContent = 
+                userDoc.data().fullName || 'Admin';
+
+            // Initialize dashboard
+            initAdminDashboard();
+        });
+    </script>
+</body>
+</html>
