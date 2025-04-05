@@ -1,0 +1,55 @@
+<header class="bg-blue-600 text-white shadow-md">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <a href="../index.html" class="text-2xl font-bold">Student-Teacher Booking</a>
+        
+        <nav class="hidden md:flex space-x-6">
+            <a href="../index.html" class="hover:underline">Home</a>
+            <a href="#" class="hover:underline">About</a>
+            <a href="#" class="hover:underline">Contact</a>
+        </nav>
+        
+        <div class="flex items-center space-x-4">
+            <div id="userGreeting" class="hidden">
+                <span class="mr-2">Hello, </span>
+                <span id="username" class="font-medium"></span>
+            </div>
+            <div id="authButtons">
+                <a href="../login.html" class="hover:underline">Login</a>
+                <a href="../register.html" class="ml-4 hover:underline">Register</a>
+            </div>
+            <button id="logoutButton" class="hidden bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm">
+                Logout
+            </button>
+        </div>
+    </div>
+</header>
+
+<script type="module">
+    import { getCurrentUser, logoutUser } from '../scripts/auth.js';
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+        const user = await getCurrentUser();
+        const userGreeting = document.getElementById('userGreeting');
+        const authButtons = document.getElementById('authButtons');
+        const logoutButton = document.getElementById('logoutButton');
+        const usernameSpan = document.getElementById('username');
+        
+        if (user) {
+            // User is logged in
+            userGreeting.classList.remove('hidden');
+            authButtons.classList.add('hidden');
+            logoutButton.classList.remove('hidden');
+            usernameSpan.textContent = user.email;
+            
+            logoutButton.addEventListener('click', async () => {
+                await logoutUser();
+                window.location.href = '../index.html';
+            });
+        } else {
+            // User is not logged in
+            userGreeting.classList.add('hidden');
+            authButtons.classList.remove('hidden');
+            logoutButton.classList.add('hidden');
+        }
+    });
+</script>
